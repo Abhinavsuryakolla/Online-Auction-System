@@ -15,16 +15,32 @@ const bidRoutes = require('./routes/bids');
 
 const Auction = require('./models/Auction');
 const Bid = require('./models/Bid');
-const User = require('./models/User');
 const Notification = require('./models/Notification');
 
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://nexora-ashy.vercel.app',
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
+app.use(express.json());
+
 const io = new Server(server, {
   cors: {
-    origin: "https://nexora-ashy.vercel.app",
-    
+    origin: allowedOrigins,
     credentials: true,
   },
 });
@@ -40,9 +56,6 @@ io.use((socket, next) => {
 });
 
 app.set('io', io);
-
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
-app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/auctions', auctionRoutes);
