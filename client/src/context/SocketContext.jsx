@@ -17,7 +17,7 @@ export const SocketProvider = ({ children }) => {
 
     console.log('[SocketProvider] Creating socket connection for user:', userId);
 
-    const newSocket = io('http://localhost:5000', {
+    const newSocket = io('https://nexora-clrw.onrender.com', {
       withCredentials: true,
       transports: ['websocket'],
       auth: { userId },
