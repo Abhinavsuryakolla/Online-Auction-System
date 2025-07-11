@@ -17,6 +17,7 @@ import Notifications from './pages/Notifications';
 import MyBids from './pages/MyBids';
 import Checkout from './pages/Checkout';
 import MyOrders from './pages/MyOrders';
+import MyAuctions from './pages/MyAuctions';
 function App() {
   return (
     <AuthProvider>
@@ -35,7 +36,7 @@ function App() {
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/myorders" element={<MyOrders />} />
-       
+            <Route path="/my-auctions" element={<MyAuctions />} />
 
             {/* Protected Buyer Routes */}
             <Route

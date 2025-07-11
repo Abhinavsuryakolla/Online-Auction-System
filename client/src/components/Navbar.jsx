@@ -163,7 +163,10 @@ const Navbar = () => {
           {user ? (
             <>
               {user.role === 'seller' ? (
-                <Link to="/create-auction" className="text-gray-300 hover:text-cyan-400 transition-colors text-lg">Create Auction</Link>
+                <>
+                  <Link to="/create-auction" className="text-gray-300 hover:text-cyan-400 transition-colors text-lg">Create Auction</Link>
+                  <Link to="/my-auctions" className="text-gray-300 hover:text-cyan-400 transition-colors text-lg">My Auctions</Link>
+                </>
               ) : (
                 <Link to="/my-bids" className="text-gray-300 hover:text-cyan-400 transition-colors text-lg">My Bids</Link>
               )}
@@ -294,9 +297,14 @@ const Navbar = () => {
           <Link to="/auctions" className="block text-gray-300 hover:text-cyan-400 transition-colors py-3 text-lg">Auctions</Link>
           {user ? (
             user.role === 'seller' ? (
-              <Link to="/create-auction" className="block text-gray-300 hover:text-cyan-400 transition-colors py-3 text-lg">
-                Create Auction
-              </Link>
+              <>
+                <Link to="/create-auction" className="block text-gray-300 hover:text-cyan-400 transition-colors py-3 text-lg">
+                  Create Auction
+                </Link>
+                <Link to="/my-auctions" className="block text-gray-300 hover:text-cyan-400 transition-colors py-3 text-lg">
+                  My Auctions
+                </Link>
+              </>
             ) : (
               <Link to="/my-bids" className="block text-gray-300 hover:text-cyan-400 transition-colors py-3 text-lg">
                 My Bids

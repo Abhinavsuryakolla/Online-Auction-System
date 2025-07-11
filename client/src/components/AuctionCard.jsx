@@ -2,7 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Countdown from 'react-countdown';
 import moment from 'moment';
 
-const AuctionCard = ({ auction }) => {
+const AuctionCard = ({ auction, onDelete, deletingId, user }) => {
   const now = new Date();
   const navigate = useNavigate();
 
@@ -17,6 +17,8 @@ const AuctionCard = ({ auction }) => {
       </span>
     );
   };
+
+  const isSeller = user && (auction.seller?._id === user.id || auction.seller === user.id);
 
   return (
     <div className="bg-gray-900 rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 w-72 border border-gray-800">
@@ -43,12 +45,47 @@ const AuctionCard = ({ auction }) => {
             )}
           </div>
 
-          <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-400">Current Bid:</span>
-            <span className="font-semibold text-yellow-400">
-              ${auction.currentBid || auction.startPrice}
-            </span>
-          </div>
+          {/* Price display based on auction status */}
+          {hasStarted ? (
+            !hasEnded ? (
+              // Live auctions: show starting price and current bid
+              <div className="space-y-1">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-400">Starting Price:</span>
+                  <span className="font-semibold text-green-400">
+                    ${auction.startPrice}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-400">Current Bid:</span>
+                  <span className="font-semibold text-yellow-400">
+                    ${auction.currentBid || auction.startPrice}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              // Ended auctions: show starting price and final bid
+              <div className="space-y-1">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-400">Starting Price:</span>
+                  <span className="font-semibold text-green-400">
+                    ${auction.startPrice}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-gray-400">Final Bid:</span>
+                  <span className="font-semibold text-red-400">
+                    ${auction.currentBid || auction.startPrice}
+                  </span>
+                </div>
+              </div>
+            )
+          ) : (
+            // Upcoming auctions: no price shown
+            <div className="text-sm text-gray-500">
+              Bidding not started yet
+            </div>
+          )}
         </div>
       </Link>
 
@@ -65,6 +102,16 @@ const AuctionCard = ({ auction }) => {
         >
           {hasStarted && !hasEnded ? 'Place Bid' : hasEnded ? 'Auction Ended' : 'Not Started'}
         </button>
+        {isSeller && onDelete && (
+          <button
+            onClick={() => onDelete(auction._id)}
+            disabled={deletingId === auction._id}
+            className="mt-3 w-full bg-red-600 text-white px-3 py-1 rounded shadow hover:bg-red-700 transition-opacity opacity-90"
+            style={{ zIndex: 2 }}
+          >
+            {deletingId === auction._id ? 'Deleting...' : 'Delete'}
+          </button>
+        )}
       </div>
     </div>
   );
