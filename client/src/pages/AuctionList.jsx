@@ -51,11 +51,11 @@ const AuctionCarousel = ({ auctions, color }) => {
             className="flex w-full"
             style={{
               transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)',
-              transform: `translateX(-${index * 18.5}rem)` // 18rem card + 0.5rem gap
+              transform: `translateX(-${index * 19}rem)` // 18rem card + 1rem gap
             }}
           >
             {auctions.map((auction) => (
-              <div key={auction._id} className="w-72 max-w-[18rem] flex-shrink-0 mr-2 last:mr-0">
+              <div key={auction._id} className="w-72 max-w-[18rem] flex-shrink-0 mr-4 last:mr-0">
                 <AuctionCard auction={auction} />
               </div>
             ))}
