@@ -48,7 +48,6 @@ const io = new Server(server, {
 io.use((socket, next) => {
   const userId = socket.handshake.auth.userId;
   if (!userId) {
-    console.log('Socket authentication failed: No userId provided');
     return next(new Error('Unauthorized'));
   }
   socket.userId = userId;
@@ -68,22 +67,17 @@ app.get('/', (req, res) => {
 });
 
 io.on('connection', (socket) => {
-  console.log(`User connected: ${socket.id} (User ID: ${socket.userId})`);
-
   socket.join(socket.userId);
 
   socket.on('joinAuction', (auctionId) => {
     socket.join(auctionId);
-    console.log(`User ${socket.userId} joined auction ${auctionId} (Socket ID: ${socket.id})`);
   });
 
   socket.on('leaveAuction', (auctionId) => {
     socket.leave(auctionId);
-    console.log(`User ${socket.userId} left auction ${auctionId} (Socket ID: ${socket.id})`);
   });
 
   socket.on('disconnect', () => {
-    console.log(`User disconnected: ${socket.id} (User ID: ${socket.userId})`);
   });
 });
 
@@ -137,10 +131,9 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
-  .then(() => console.log('Connected to MongoDB'))
+  .then(() => {})
   .catch((err) => console.error('MongoDB connection error:', err));
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
 });

@@ -23,7 +23,7 @@ const Notification = ({ notification, onMarkAsRead }) => {
     e.stopPropagation();
     if (isMarking || isRead) return;
 
-    console.log('[Notification] Marking as read:', notification._id);
+
     setIsMarking(true);
     setIsRead(true);
     try {
@@ -49,7 +49,7 @@ const Notification = ({ notification, onMarkAsRead }) => {
     e.stopPropagation();
     if (isAddingToCart || !notification.auction?._id) return;
 
-    console.log('[Notification] Adding to cart:', notification.auction._id);
+
     setIsAddingToCart(true);
     try {
       await axios.post(
@@ -78,7 +78,6 @@ const Notification = ({ notification, onMarkAsRead }) => {
 
   const handleLinkClick = () => {
     if (!isRead && onMarkAsRead && !isMarking) {
-      console.log('[Notification] Link clicked, marking as read:', notification._id);
       setIsRead(true);
       onMarkAsRead();
     }

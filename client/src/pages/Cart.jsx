@@ -29,7 +29,6 @@ const Cart = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          console.log('[Cart] No token, skipping fetchCartItems');
           setCartItems([]);
           setLoading(false);
           return;
@@ -41,7 +40,6 @@ const Cart = () => {
         });
         const validItems = res.data.filter((item) => item && item._id && item.auction);
         setCartItems(validItems);
-        console.log('[Cart] Cart items fetched:', validItems);
         setLoading(false);
       } catch (err) {
         console.error('[Cart] Error fetching cart items:', err.message);
@@ -56,7 +54,6 @@ const Cart = () => {
   const handleSelectItem = (id) => {
     setSelectedItems((prev) => {
       const updated = prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id];
-      console.log('[DEBUG] Selected items:', updated);
       return updated;
     });
   };
@@ -129,7 +126,6 @@ const Cart = () => {
       return;
     }
     const selected = cartItems.filter((item) => selectedItems.includes(item._id));
-    console.log('[DEBUG] Navigating to checkout with:', selected, total);
     navigate('/checkout', { state: { items: selected, total } });
   };
 

@@ -23,33 +23,21 @@ const BidForm = ({ auction, onBidPlaced }) => {
   const auctionId = useMemo(() => auction?._id?.toString(), [auction?._id]);
 
   useEffect(() => {
-    console.log('[BidForm] Auction ID:', auctionId, 'User:', user);
   }, [auctionId, user]);
 
   useEffect(() => {
     if (!socket || !auctionId || !user?._id) {
-      console.log('[BidForm] Cannot join auction room:', {
-        socket: !!socket,
-        auctionId,
-        userId: user?._id,
-      });
       return;
     }
 
     const handleConnect = () => {
       if (socket.connected) {
         socket.emit('joinAuction', auctionId);
-        console.log(`[BidForm] Joined auction room: ${auctionId}`);
-      } else {
-        console.log('[BidForm] Socket not connected on connect event');
       }
     };
 
     if (socket.connected) {
       socket.emit('joinAuction', auctionId);
-      console.log(`[BidForm] Joined auction room: ${auctionId}`);
-    } else {
-      console.log('[BidForm] Socket not connected initially');
     }
 
     socket.on('connect', handleConnect);
@@ -62,14 +50,12 @@ const BidForm = ({ auction, onBidPlaced }) => {
       socket.off('connect_error');
       if (socket.connected) {
         socket.emit('leaveAuction', auctionId);
-        console.log(`[BidForm] Left auction room: ${auctionId}`);
       }
     };
   }, [socket, auctionId, user?._id]);
 
   useEffect(() => {
     if (!auction) {
-      console.log('[BidForm] No auction data');
       return;
     }
 
@@ -78,7 +64,6 @@ const BidForm = ({ auction, onBidPlaced }) => {
       auction.startPrice
     ) + 1;
 
-    console.log('[BidForm] Setting initial min bid:', initialMin);
     setMinBid(initialMin);
     setBidAmount(initialMin.toString());
   }, [auction]);
@@ -103,24 +88,17 @@ const BidForm = ({ auction, onBidPlaced }) => {
 
   useEffect(() => {
     if (!socket || !auctionId) {
-      console.log('[BidForm] Cannot set up newBid listener:', {
-        socket: !!socket,
-        auctionId,
-      });
       return;
     }
 
     const handleNewBid = (newBid) => {
-      console.log('[BidForm] Received newBid:', newBid);
       if (newBid.auction !== auctionId) {
-        console.log('[BidForm] Bid ignored, wrong auction:', newBid.auction);
         return;
       }
 
       setBids((prev) => {
         // Check if bid is a duplicate by _id
         if (prev.some((bid) => bid._id === newBid._id)) {
-          console.log('[BidForm] Duplicate bid ignored:', newBid._id);
           return prev;
         }
 
@@ -131,14 +109,12 @@ const BidForm = ({ auction, onBidPlaced }) => {
           newBid.amount === Number(bidAmount) &&
           newBid.auction === auctionId
         ) {
-          console.log('[BidForm] Ignoring own bid from socket:', newBid._id);
           setOptimisticBidId(null); // Clear optimistic bid tracking
           return prev.filter((bid) => bid._id !== optimisticBidId); // Remove optimistic bid
         }
 
         // Add new bid for other users
         const updatedBids = [...prev, newBid].sort((a, b) => b.amount - a.amount);
-        console.log('[BidForm] Updated bids:', updatedBids);
         return updatedBids;
       });
     };
@@ -146,13 +122,11 @@ const BidForm = ({ auction, onBidPlaced }) => {
     socket.on('newBid', handleNewBid);
 
     socket.on('reconnect', async () => {
-      console.log('[BidForm] Socket reconnected, refetching bids');
       try {
         const res = await axios.get(BASE_URL + `/bids/${auctionId}`, {
           signal: abortController.current.signal,
         });
         setBids(res.data.sort((a, b) => b.amount - a.amount));
-        console.log('[BidForm] Bids refetched on reconnect:', res.data);
         setOptimisticBidId(null); // Clear optimistic bid on reconnect
       } catch (err) {
         if (!axios.isCancel(err)) {
@@ -172,7 +146,6 @@ const BidForm = ({ auction, onBidPlaced }) => {
     if (bids.length > 0) {
       const highestBid = Math.max(...bids.map((bid) => bid.amount));
       const newMin = highestBid + 1;
-      console.log('[BidForm] Updating min bid:', newMin);
       setMinBid(newMin);
       if (Number(bidAmount) < newMin) {
         setBidAmount(newMin.toString());
@@ -185,19 +158,16 @@ const BidForm = ({ auction, onBidPlaced }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (processing || !user || !auctionId) {
-      console.log('[BidForm] Submit blocked:', { processing, user, auctionId });
       return;
     }
 
     const numericAmount = Number(bidAmount);
     if (numericAmount < minBid) {
-      console.log('[BidForm] Bid too low:', numericAmount, '<', minBid);
       toast.error(`Bid must be at least $${minBid}`);
       return;
     }
 
     setProcessing(true);
-    console.log('[BidForm] Submitting bid:', numericAmount);
 
     const tempId = `temp-${Date.now()}`;
     const optimisticBid = {
@@ -210,7 +180,6 @@ const BidForm = ({ auction, onBidPlaced }) => {
     setOptimisticBidId(tempId); // Track optimistic bid
     setBids((prev) => {
       const updatedBids = [...prev, optimisticBid].sort((a, b) => b.amount - a.amount);
-      console.log('[BidForm] Optimistic bids:', updatedBids);
       return updatedBids;
     });
 
@@ -223,14 +192,11 @@ const BidForm = ({ auction, onBidPlaced }) => {
           signal: abortController.current.signal,
         }
       );
-      console.log('[BidForm] Bid response:', res.data);
-
       setBids((prev) => {
         const updatedBids = prev
           .filter((bid) => bid._id !== tempId) // Remove optimistic bid
           .concat(res.data)
           .sort((a, b) => b.amount - a.amount);
-        console.log('[BidForm] Bids after server response:', updatedBids);
         return updatedBids;
       });
       setOptimisticBidId(null); // Clear optimistic bid
@@ -247,7 +213,6 @@ const BidForm = ({ auction, onBidPlaced }) => {
         try {
           const res = await axios.get(BASE_URL + `/bids/${auctionId}`);
           setBids(res.data.sort((a, b) => b.amount - a.amount));
-          console.log('[BidForm] Bids refetched after error:', res.data);
         } catch (fetchErr) {
           console.error('[BidForm] Error refetching bids:', fetchErr.message);
         }

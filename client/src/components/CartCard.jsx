@@ -93,7 +93,7 @@ const CartCard = ({ cartItem, onSelect, onDelete, isSelected, onBuyNow }) => {
         {/* Buttons */}
         <div className="flex space-x-4 mt-auto">
           <button
-            onClick={() => console.log('View Details')} // Replace with actual view details logic
+            onClick={() => {}} // Replace with actual view details logic
             className="px-4 py-2 bg-cyan-600 text-white rounded-lg font-semibold shadow hover:bg-cyan-700 hover:scale-105 transition-all duration-300"
           >
             View Details

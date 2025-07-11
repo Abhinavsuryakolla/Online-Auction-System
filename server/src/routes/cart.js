@@ -36,7 +36,6 @@ router.post('/', authMiddleware, async (req, res) => {
 
 router.post('/checkout', authMiddleware, async (req, res) => {
   const { cartItemIds, address } = req.body; // cartItemIds: array of cart item IDs
-  console.log('[DEBUG] /checkout request body:', req.body);
   try {
     const user = await User.findById(req.user.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -92,11 +91,9 @@ router.get('/orders', authMiddleware, async (req, res) => {
 router.delete('/:id', authMiddleware, async (req, res) => {
   try {
     const cartItem = await Cart.findById(req.params.id);
-    console.log('Delete cart item:', req.params.id, 'Found:', !!cartItem, 'CartItem:', cartItem);
     if (!cartItem) {
       return res.status(404).json({ error: 'Cart item not found' });
     }
-    console.log('Cart item user:', cartItem.user, 'Request user:', req.user.id);
     if (cartItem.user.toString() !== req.user.id) {
       return res.status(403).json({ error: 'Not authorized to delete this cart item' });
     }

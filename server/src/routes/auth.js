@@ -15,7 +15,6 @@ router.post('/register', async (req, res) => {
     await user.save();
 
     const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
-    console.log('Register input:', req.body);
 
     res.status(201).json({
       token,
@@ -37,7 +36,6 @@ router.post('/register', async (req, res) => {
 // LOGIN
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  console.log(req.body.password);
   try {
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await user.comparePassword(password))) {
@@ -107,7 +105,6 @@ router.put('/profile', authenticate, async (req, res) => {
 router.post('/wallet/add', authenticate, async (req, res) => {
   let { amount } = req.body;
   amount = Number(amount);
-  console.log('Add money request:', { userId: req.user.id, amount });
   if (!amount || amount <= 0) return res.status(400).json({ error: 'Invalid amount' });
   try {
     const user = await User.findById(req.user.id);

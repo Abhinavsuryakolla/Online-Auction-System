@@ -7,10 +7,8 @@ import { BASE_URL } from '../utils/constants';
 function Checkout() {
   const location = useLocation();
   const navigate = useNavigate();
-  console.log('[DEBUG] location.state:', location.state);
   const { user, setUser } = useAuth();
   const { items = [], total = 0 } = location.state || {};
-  console.log('[DEBUG] Checkout received items:', items, 'total:', total);
   const [address, setAddress] = useState({
     country: '',
     state: '',

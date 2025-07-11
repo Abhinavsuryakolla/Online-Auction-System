@@ -37,7 +37,6 @@ const Navbar = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          console.log('[Navbar] No token, skipping fetchNotifications');
           setNotifications([]);
           return;
         }
@@ -50,7 +49,6 @@ const Navbar = () => {
           .filter((n) => n && n._id && typeof n.read === 'boolean')
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setNotifications(validNotifications);
-        console.log('[Navbar] Notifications fetched:', validNotifications);
       } catch (err) {
         console.error('[Navbar] Error fetching notifications:', err.message);
         setNotifications([]);
@@ -68,14 +66,11 @@ const Navbar = () => {
     if (!socket || !user) return;
 
     const handleNewNotification = (notification) => {
-      console.log('[Navbar] Received newNotification:', notification);
       if (!notification || !notification._id || typeof notification.read !== 'boolean') {
-        console.error('[Navbar] Invalid newNotification:', notification);
         return;
       }
       setNotifications((prev) => {
         if (prev.some((n) => n._id === notification._id)) {
-          console.log('[Navbar] Duplicate notification ignored:', notification._id);
           return prev;
         }
         return [notification, ...prev].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -83,7 +78,6 @@ const Navbar = () => {
     };
 
     const handleNotificationRead = ({ _id, read }) => {
-      console.log('[Navbar] Received notificationRead:', { _id, read });
       setNotifications((prev) =>
         prev.map((n) => (n._id === _id ? { ...n, read } : n))
       );
@@ -125,7 +119,6 @@ const Navbar = () => {
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, read: true } : n))
       );
-      console.log('[Navbar] Marked as read:', res.data);
     } catch (err) {
       console.error('[Navbar] Error marking as read:', err.message);
       throw err;
@@ -134,7 +127,6 @@ const Navbar = () => {
 
   const handleViewAllClick = (e) => {
     e.stopPropagation();
-    console.log('[Navbar] View all clicked');
     setShowNotifications(false);
   };
 

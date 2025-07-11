@@ -27,7 +27,6 @@ const Notifications = () => {
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          console.log('[Notifications] No token, skipping fetchNotifications');
           setNotifications([]);
           setLoading(false);
           return;
@@ -41,7 +40,6 @@ const Notifications = () => {
           .filter((n) => n && n._id && typeof n.read === 'boolean')
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         setNotifications(validNotifications);
-        console.log('[Notifications] Notifications fetched:', validNotifications);
         setLoading(false);
       } catch (err) {
         console.error('[Notifications] Error fetching notifications:', err.message);
@@ -62,14 +60,11 @@ const Notifications = () => {
     if (!socket || !user) return;
 
     const handleNewNotification = (notification) => {
-      console.log('[Notifications] Received newNotification:', notification);
       if (!notification || !notification._id || typeof notification.read !== 'boolean') {
-        console.error('[Notifications] Invalid newNotification:', notification);
         return;
       }
       setNotifications((prev) => {
         if (prev.some((n) => n._id === notification._id)) {
-          console.log('[Notifications] Duplicate notification ignored:', notification._id);
           return prev;
         }
         return [notification, ...prev].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -77,7 +72,6 @@ const Notifications = () => {
     };
 
     const handleNotificationRead = ({ _id, read }) => {
-      console.log('[Notifications] Received notificationRead:', { _id, read });
       setNotifications((prev) =>
         prev.map((n) => (n._id === _id ? { ...n, read } : n))
       );
@@ -102,7 +96,6 @@ const Notifications = () => {
       setNotifications((prev) =>
         prev.map((n) => (n._id === id ? { ...n, read: true } : n))
       );
-      console.log('[Notifications] Marked as read:', res.data);
     } catch (err) {
       console.error('[Notifications] Error marking as read:', err.message);
       throw err; // Propagate to Notification.jsx
