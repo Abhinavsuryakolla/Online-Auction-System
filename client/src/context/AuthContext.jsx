@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { BASE_URL } from '../utils/constants';
+import { showToast } from '../components/toastUtils';
 
 const AuthContext = createContext();
 
@@ -35,6 +36,62 @@ export const AuthProvider = ({ children }) => {
 
     checkAuth();
   }, []);
+
+  // Listen for real-time wallet updates
+  useEffect(() => {
+    const handleWalletUpdate = (event) => {
+      const { userId, newBalance, change, type } = event.detail;
+      
+      // Only update if this wallet update is for the current user
+      if (user && (user.id === userId || user._id === userId)) {
+        setUser(prevUser => ({
+          ...prevUser,
+          wallet: newBalance
+        }));
+        
+        // Show toast notification based on the type of wallet update
+        const changeText = change > 0 ? `+$${change.toFixed(2)}` : `-$${Math.abs(change).toFixed(2)}`;
+        const balanceText = `New balance: $${newBalance.toFixed(2)}`;
+        
+        let message = '';
+        let toastType = 'info';
+        
+        switch (type) {
+          case 'blocked':
+            message = `Amount blocked: ${changeText}. ${balanceText}`;
+            toastType = 'warning';
+            break;
+          case 'unblocked':
+            message = `Amount unblocked: ${changeText}. ${balanceText}`;
+            toastType = 'success';
+            break;
+          case 'purchase':
+            message = `Purchase completed: ${changeText}. ${balanceText}`;
+            toastType = 'success';
+            break;
+          case 'added':
+            message = `Money added: ${changeText}. ${balanceText}`;
+            toastType = 'success';
+            break;
+          case 'auction_ended_unblocked':
+            message = `Auction ended - amount unblocked: ${changeText}. ${balanceText}`;
+            toastType = 'info';
+            break;
+          default:
+            message = `Wallet updated: ${changeText}. ${balanceText}`;
+            toastType = 'info';
+        }
+        
+        showToast(message, toastType);
+      }
+    };
+
+    window.addEventListener('walletUpdate', handleWalletUpdate);
+
+    return () => {
+      window.removeEventListener('walletUpdate', handleWalletUpdate);
+    };
+  }, [user]);
 
   const login = async (credentials) => {
     const res = await axios.post(BASE_URL + '/auth/login', credentials);

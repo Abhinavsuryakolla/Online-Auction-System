@@ -111,6 +111,18 @@ router.post('/wallet/add', authenticate, async (req, res) => {
     if (!user) return res.status(404).json({ error: 'User not found' });
     user.wallet += amount;
     await user.save();
+    
+    // Emit real-time wallet update
+    const io = req.app.get('io');
+    if (io) {
+      io.to(user._id.toString()).emit('walletUpdate', {
+        userId: user._id.toString(),
+        newBalance: user.wallet,
+        change: amount,
+        type: 'added'
+      });
+    }
+    
     res.json({ message: 'Money added', wallet: user.wallet });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });

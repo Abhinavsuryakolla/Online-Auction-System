@@ -5,6 +5,7 @@ const Auction = require('../models/Auction');
 const authMiddleware = require('../middleware/auth');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const { blockAmount, unblockAmount } = require('../utils/wallet');
 
 router.post('/:auctionId', authMiddleware, async (req, res) => {
   const { amount } = req.body;
@@ -55,15 +56,13 @@ router.post('/:auctionId', authMiddleware, async (req, res) => {
     if (user.wallet < blockAmount) {
       return res.status(400).json({ error: 'Insufficient wallet balance' });
     }
-    user.wallet -= blockAmount;
-    await user.save();
+    
+    // Block amount for current user
+    await blockAmount(user._id, blockAmount, io);
+    
     if (prevBid && prevBid.user.toString() !== user._id.toString()) {
       // Unblock previous highest bidder
-      const prevUser = await User.findById(prevBid.user);
-      if (prevUser) {
-        prevUser.wallet += prevBid.amount;
-        await prevUser.save();
-      }
+      await unblockAmount(prevBid.user, prevBid.amount, io);
     }
 
     const bid = new Bid({
@@ -140,7 +139,7 @@ router.get('/:auctionId/paginated', async (req, res) => {
 });
 
 // Helper: End auction, notify winner, unblock others
-async function handleAuctionEnd(auctionId) {
+async function handleAuctionEnd(auctionId, io = null) {
   const auction = await Auction.findById(auctionId);
   if (!auction || auction.status !== 'active') return;
   auction.status = 'ended';
@@ -160,6 +159,17 @@ async function handleAuctionEnd(auctionId) {
       if (user) {
         user.wallet += bids[i].amount;
         await user.save();
+        
+        // Emit real-time wallet update if io is provided
+        if (io) {
+          io.to(user._id.toString()).emit('walletUpdate', {
+            userId: user._id.toString(),
+            newBalance: user.wallet,
+            change: bids[i].amount,
+            type: 'auction_ended_unblocked'
+          });
+        }
+        
         await Notification.create({
           user: user._id,
           message: `You were outbid in the auction for ${auction.title}. Your blocked amount has been unblocked.`,
@@ -170,4 +180,4 @@ async function handleAuctionEnd(auctionId) {
   }
 }
 
-module.exports = router;
+module.exports = { router, handleAuctionEnd };

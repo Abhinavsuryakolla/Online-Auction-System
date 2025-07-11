@@ -53,6 +53,17 @@ router.post('/checkout', authMiddleware, async (req, res) => {
 
     user.wallet -= total;
     await user.save();
+    
+    // Emit real-time wallet update
+    const io = req.app.get('io');
+    if (io) {
+      io.to(user._id.toString()).emit('walletUpdate', {
+        userId: user._id.toString(),
+        newBalance: user.wallet,
+        change: -total,
+        type: 'purchase'
+      });
+    }
 
     // Create orders and remove cart items
     const orders = [];

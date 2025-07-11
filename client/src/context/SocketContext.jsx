@@ -43,6 +43,11 @@ export const SocketProvider = ({ children }) => {
     newSocket.on('newBid', (bid) => {
     });
 
+    newSocket.on('walletUpdate', (data) => {
+      // This will be handled by AuthContext
+      window.dispatchEvent(new CustomEvent('walletUpdate', { detail: data }));
+    });
+
     setSocket(newSocket);
 
     return () => {

@@ -11,7 +11,7 @@ const authRoutes = require('./routes/auth');
 const auctionRoutes = require('./routes/auctions');
 const cartRoutes = require('./routes/cart');
 const notificationRoutes = require('./routes/notifications');
-const bidRoutes = require('./routes/bids');
+const { router: bidRoutes, handleAuctionEnd } = require('./routes/bids');
 
 const Auction = require('./models/Auction');
 const Bid = require('./models/Bid');
@@ -113,6 +113,9 @@ const closeAuctions = async () => {
         auctionId: auction._id,
         winner: highestBid?.user?._id,
       });
+      
+      // Handle unblocking amounts for other bidders
+      await handleAuctionEnd(auction._id, io);
     }
   } catch (err) {
     console.error('Error closing auctions:', err.message);
