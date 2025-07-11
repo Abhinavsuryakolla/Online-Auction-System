@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { format, addDays, isAfter } from 'date-fns';
 import { useAuth } from '../context/AuthContext';
+import { BASE_URL } from '../utils/constants';
 
 const MyOrders = () => {
   const { user } = useAuth();
@@ -20,7 +21,7 @@ const MyOrders = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get('http://localhost:5000/api/cart/orders', {
+        const res = await axios.get(BASE_URL+'/cart/orders', {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         // Only show orders placed within the last 7 days
