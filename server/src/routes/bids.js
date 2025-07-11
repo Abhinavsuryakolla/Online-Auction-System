@@ -45,7 +45,8 @@ router.post('/:auctionId', authMiddleware, async (req, res) => {
 
     // Find previous highest bid
     const prevBid = await Bid.findOne({ auction: auction._id }).sort({ amount: -1 });
-    let blockAmount = minValidBid - 1; // The minimum required to be blocked
+    let blockAmount = amount;
+ // The minimum required to be blocked
     if (!prevBid) {
       // First bid: block minValidBid - 1 (which is startPrice)
       blockAmount = minValidBid - 1;
