@@ -46,26 +46,26 @@ router.post('/:auctionId', authMiddleware, async (req, res) => {
 
     // Find previous highest bid
     const prevBid = await Bid.findOne({ auction: auction._id }).sort({ amount: -1 });
-    let blockAmount = amount;
+    let amountToBlock = amount;
     if (!prevBid) {
-      blockAmount = minValidBid - 1;
+      amountToBlock = minValidBid - 1;
     } else if (prevBid.user.toString() === user._id.toString()) {
-      blockAmount = amount - prevBid.amount;
-      if (blockAmount <= 0) {
+      amountToBlock = amount - prevBid.amount;
+      if (amountToBlock <= 0) {
         console.log('[BID] New bid not higher than previous:', amount, prevBid.amount);
         return res.status(400).json({ error: 'New bid must be higher than your previous bid' });
       }
     } else {
-      blockAmount = minValidBid - 1;
+      amountToBlock = minValidBid - 1;
     }
-    if (user.wallet < blockAmount) {
-      console.log('[BID] Insufficient wallet:', user.wallet, 'needed:', blockAmount);
+    if (user.wallet < amountToBlock) {
+      console.log('[BID] Insufficient wallet:', user.wallet, 'needed:', amountToBlock);
       return res.status(400).json({ error: 'Insufficient wallet balance' });
     }
 
     // Block amount for current user
-    await blockAmount(user._id, blockAmount, io);
-    console.log('[BID] Blocked amount for user:', user._id, blockAmount);
+    await blockAmount(user._id, amountToBlock, io);
+    console.log('[BID] Blocked amount for user:', user._id, amountToBlock);
 
     if (prevBid && prevBid.user.toString() !== user._id.toString()) {
       await unblockAmount(prevBid.user, prevBid.amount, io);
