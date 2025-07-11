@@ -11,58 +11,65 @@ router.post('/:auctionId', authMiddleware, async (req, res) => {
   const { amount } = req.body;
   const io = req.app.get('io');
 
+  console.log('[BID] Incoming bid:', { auctionId: req.params.auctionId, userId: req.user.id, amount });
+
   try {
     const auction = await Auction.findById(req.params.auctionId);
     if (!auction) {
+      console.log('[BID] Auction not found:', req.params.auctionId);
       return res.status(404).json({ error: 'Auction not found' });
     }
 
     const now = new Date();
     if (now < new Date(auction.startTime)) {
+      console.log('[BID] Auction not started yet:', auction._id);
       return res.status(400).json({ error: 'Auction has not started' });
     }
 
     if (now > new Date(auction.endTime) || auction.status !== 'active') {
+      console.log('[BID] Auction ended or inactive:', auction._id, auction.status);
       return res.status(400).json({ error: 'Auction has ended' });
     }
 
     const minValidBid = Math.max(auction.currentBid || 0, auction.startPrice) + 1;
-
     if (amount <= minValidBid - 1) {
+      console.log('[BID] Bid amount too low:', amount, 'minValidBid:', minValidBid);
       return res.status(400).json({ error: 'Bid amount too low' });
     }
 
     // Wallet logic
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (!user) {
+      console.log('[BID] User not found:', req.user.id);
+      return res.status(404).json({ error: 'User not found' });
+    }
 
     // Find previous highest bid
     const prevBid = await Bid.findOne({ auction: auction._id }).sort({ amount: -1 });
     let blockAmount = amount;
- // The minimum required to be blocked
     if (!prevBid) {
-      // First bid: block minValidBid - 1 (which is startPrice)
       blockAmount = minValidBid - 1;
     } else if (prevBid.user.toString() === user._id.toString()) {
-      // User is increasing their own bid: block only the difference
       blockAmount = amount - prevBid.amount;
       if (blockAmount <= 0) {
+        console.log('[BID] New bid not higher than previous:', amount, prevBid.amount);
         return res.status(400).json({ error: 'New bid must be higher than your previous bid' });
       }
     } else {
-      // New highest bidder: block minValidBid - 1
       blockAmount = minValidBid - 1;
     }
     if (user.wallet < blockAmount) {
+      console.log('[BID] Insufficient wallet:', user.wallet, 'needed:', blockAmount);
       return res.status(400).json({ error: 'Insufficient wallet balance' });
     }
-    
+
     // Block amount for current user
     await blockAmount(user._id, blockAmount, io);
-    
+    console.log('[BID] Blocked amount for user:', user._id, blockAmount);
+
     if (prevBid && prevBid.user.toString() !== user._id.toString()) {
-      // Unblock previous highest bidder
       await unblockAmount(prevBid.user, prevBid.amount, io);
+      console.log('[BID] Unblocked previous highest bidder:', prevBid.user, prevBid.amount);
     }
 
     const bid = new Bid({
@@ -71,9 +78,11 @@ router.post('/:auctionId', authMiddleware, async (req, res) => {
       auction: req.params.auctionId,
     });
     await bid.save();
+    console.log('[BID] Bid saved:', bid._id);
 
     auction.currentBid = amount;
     await auction.save();
+    console.log('[BID] Auction updated with new currentBid:', auction._id, amount);
 
     await bid.populate('user', 'name email');
 
@@ -82,12 +91,12 @@ router.post('/:auctionId', authMiddleware, async (req, res) => {
       auction: bid.auction.toString(),
     };
 
-    // Log number of clients in the room
     const roomClients = io.sockets.adapter.rooms.get(bid.auction.toString())?.size || 0;
     io.to(bid.auction.toString()).emit('newBid', bidToEmit);
+    console.log('[BID] Emitted newBid to room:', bid.auction.toString(), 'clients:', roomClients);
     res.status(201).json(bid);
   } catch (err) {
-    console.error('!!! ERROR !!!', err.message, err.stack);
+    console.error('[BID] ERROR:', err.message, err.stack);
     res.status(500).json({ error: 'Server error' });
   }
 });
