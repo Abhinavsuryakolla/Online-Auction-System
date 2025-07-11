@@ -113,7 +113,7 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     if (auction.currentBid > 0) {
       return res.status(400).json({ error: 'Cannot delete auction with bids' });
     }
-    await auction.remove();
+    await Auction.deleteOne({ _id: req.params.id });
     res.json({ message: 'Auction deleted' });
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
