@@ -79,13 +79,15 @@ This project was designed as a personal portfolio project to demonstrate:
 
 cd client
 npm install
-# or
+or
 yarn install
 
 npm start
-# or
+or
 yarn start
 Frontend runs at: http://localhost:3000
+
+
 
 ### 🔧 Backend Setup
 
@@ -95,8 +97,10 @@ npm install
 npm start
 Backend runs at: http://localhost:5000
 
-### 🔐 Environment Variables
-## Create a .env file in the /server directory:
+
+
+## 🔐 Environment Variables
+### Create a .env file in the /server directory:
 
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/nexora
@@ -104,7 +108,7 @@ JWT_SECRET=your_jwt_secret
 CLIENT_URL=http://localhost:3000
 
 
-### 📁 Project Structure
+## 📁 Project Structure
 
 nexora/
 ├── client/                             
@@ -138,8 +142,8 @@ nexora/
 └── LICENSE
 
 
-### 🙌 Contributing
-## Contributions are welcome! Follow these steps:
+## 🙌 Contributing
+### Contributions are welcome! Follow these steps:
 
 git checkout -b feature/your-feature-name
 git commit -m "✨ Add [your feature]"
