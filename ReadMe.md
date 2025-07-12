@@ -5,17 +5,6 @@
   Built to demonstrate full-stack capabilities with authentication, secure bidding, REST APIs, and real-time WebSocket communication.
 </p>
 
-<p align="center">
-  <a href="https://github.com/Abhinavsuryakolla/nexora/actions">
-    <img src="https://img.shields.io/github/actions/workflow/status/Abhinavsuryakolla/nexora/ci.yml?branch=main&style=flat-square" alt="CI Status"/>
-  </a>
-  <a href="https://github.com/Abhinavsuryakolla/nexora/releases">
-    <img src="https://img.shields.io/github/v/release/Abhinavsuryakolla/nexora?style=flat-square" alt="Latest Release"/>
-  </a>
-  <a href="LICENSE">
-    <img src="https://img.shields.io/github/license/Abhinavsuryakolla/nexora?style=flat-square" alt="MIT License"/>
-  </a>
-</p>
 
 ---
 
@@ -98,29 +87,32 @@ npm start
 yarn start
 Frontend runs at: http://localhost:3000
 
-
 🔧 Backend Setup
-
+bash
+Copy
+Edit
 cd server
 npm install
+
 npm start
 Backend runs at: http://localhost:5000
-
-
 
 🔐 Environment Variables
 Create a .env file in the /server directory:
 
+env
+Copy
+Edit
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/nexora
 JWT_SECRET=your_jwt_secret
 CLIENT_URL=http://localhost:3000
 
 
-
-
 📁 Project Structure
-
+pgsql
+Copy
+Edit
 nexora/
 ├── client/                             
 │   ├── public/
@@ -139,10 +131,9 @@ nexora/
 ├── server/                            
 │   ├── src/
 │   │   ├── routes/                     
-│   │   ├── controllers/               
+│   │   ├── models/               
 │   │   ├── middlewares/               
-│   │   ├── config/                    
-│   │   ├── sockets/                   
+│   │   ├── server.js/                                      
 │   │   └── utils/                     
 │   ├── .env                            
 │   ├── server.js                       
@@ -152,16 +143,15 @@ nexora/
 ├── .gitignore
 ├── README.md
 └── LICENSE
-
-
-
 🙌 Contributing
 Contributions are welcome! Follow these steps:
 
+bash
+Copy
+Edit
 git checkout -b feature/your-feature-name
 git commit -m "✨ Add [your feature]"
 git push origin feature/your-feature-name
-
 Then open a Pull Request 🚀
 
 
