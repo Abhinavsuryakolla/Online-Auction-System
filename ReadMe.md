@@ -74,9 +74,10 @@ This project was designed as a personal portfolio project to demonstrate:
 
 ---
 
+
 ### 🔧 Frontend Setup
 
-
+```
 cd client
 npm install
 or
@@ -87,16 +88,17 @@ or
 yarn start
 Frontend runs at: http://localhost:3000
 
+```
 
 
 ### 🔧 Backend Setup
-
+```
 cd server
 npm install
 
 npm start
 Backend runs at: http://localhost:5000
-
+```
 
 
 ## 🔐 Environment Variables
@@ -105,7 +107,6 @@ Backend runs at: http://localhost:5000
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/nexora
 JWT_SECRET=your_jwt_secret
-CLIENT_URL=http://localhost:3000
 
 ```
 
