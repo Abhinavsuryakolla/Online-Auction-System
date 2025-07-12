@@ -76,7 +76,7 @@ This project was designed as a personal portfolio project to demonstrate:
 
 ### 🔧 Frontend Setup
 
-```bash
+
 cd client
 npm install
 # or
@@ -87,32 +87,25 @@ npm start
 yarn start
 Frontend runs at: http://localhost:3000
 
-🔧 Backend Setup
-bash
-Copy
-Edit
+### 🔧 Backend Setup
+
 cd server
 npm install
 
 npm start
 Backend runs at: http://localhost:5000
 
-🔐 Environment Variables
-Create a .env file in the /server directory:
+### 🔐 Environment Variables
+## Create a .env file in the /server directory:
 
-env
-Copy
-Edit
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/nexora
 JWT_SECRET=your_jwt_secret
 CLIENT_URL=http://localhost:3000
 
 
-📁 Project Structure
-pgsql
-Copy
-Edit
+### 📁 Project Structure
+
 nexora/
 ├── client/                             
 │   ├── public/
@@ -143,12 +136,11 @@ nexora/
 ├── .gitignore
 ├── README.md
 └── LICENSE
-🙌 Contributing
-Contributions are welcome! Follow these steps:
 
-bash
-Copy
-Edit
+
+### 🙌 Contributing
+## Contributions are welcome! Follow these steps:
+
 git checkout -b feature/your-feature-name
 git commit -m "✨ Add [your feature]"
 git push origin feature/your-feature-name
