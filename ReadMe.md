@@ -101,15 +101,16 @@ Backend runs at: http://localhost:5000
 
 ## 🔐 Environment Variables
 ### Create a .env file in the /server directory:
-
+```
 PORT=5000
 MONGO_URI=mongodb://localhost:27017/nexora
 JWT_SECRET=your_jwt_secret
 CLIENT_URL=http://localhost:3000
 
+```
 
 ## 📁 Project Structure
-
+```
 nexora/
 ├── client/                             
 │   ├── public/
@@ -140,16 +141,17 @@ nexora/
 ├── .gitignore
 ├── README.md
 └── LICENSE
-
+```
 
 ## 🙌 Contributing
 ### Contributions are welcome! Follow these steps:
-
+```
 git checkout -b feature/your-feature-name
 git commit -m "✨ Add [your feature]"
 git push origin feature/your-feature-name
 Then open a Pull Request 🚀
 
+```
 
 📄 License
 Distributed under the MIT License.
